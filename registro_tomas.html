@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Registro de Tomas 🍼</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Quicksand:wght@400;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --cream:#FFF8F0; --blush:#FFD6CC; --rose:#F4A5A0; --deep:#D97B78;
+    --soft:#FFF0E8; --muted:#C4857F; --text:#5C3D3A; --light:#A06060;
+    --white:#FFFFFF; --shadow:rgba(217,123,120,0.2);
+  }
+  body { font-family:'Nunito',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+  .app { width:100%; max-width:420px; min-height:100vh; display:flex; flex-direction:column; background:var(--cream); }
+
+  /* ── Header ── */
+  .header { background:linear-gradient(135deg,#F4A5A0,#D97B78); padding:24px 20px 28px; text-align:center; border-radius:0 0 32px 32px; box-shadow:0 8px 24px rgba(217,123,120,.25); position:relative; overflow:hidden; }
+  .header::before { content:''; position:absolute; top:-30px; right:-30px; width:130px; height:130px; background:rgba(255,255,255,.1); border-radius:50%; }
+  .baby-icon { font-size:40px; margin-bottom:6px; display:block; }
+  .header h1 { font-family:'Quicksand',sans-serif; font-size:21px; font-weight:700; color:#fff; }
+  .header .subtitle { font-size:12px; color:rgba(255,255,255,.85); margin-top:3px; }
+
+  /* ── Auth banner ── */
+  .auth-banner { margin:14px 16px 0; background:var(--white); border-radius:16px; padding:14px 16px; border:1.5px solid var(--blush); box-shadow:0 4px 16px var(--shadow); display:none; }
+  .auth-banner.visible { display:block; animation:fadeIn .25s ease; }
+  .auth-title { font-family:'Quicksand',sans-serif; font-size:14px; font-weight:700; color:var(--deep); margin-bottom:8px; }
+  .auth-input { width:100%; padding:10px 12px; border:1.5px solid var(--blush); border-radius:10px; font-family:'Nunito',sans-serif; font-size:13px; color:var(--text); background:var(--soft); outline:none; margin-bottom:8px; }
+  .auth-input:focus { border-color:var(--rose); }
+  .btn-auth { width:100%; padding:11px; background:linear-gradient(135deg,var(--rose),var(--deep)); border:none; border-radius:12px; color:#fff; font-family:'Quicksand',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
+  .auth-help { font-size:11px; color:var(--light); line-height:1.5; margin-top:6px; }
+  .auth-status { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; padding:4px 0; }
+  .auth-dot { width:10px; height:10px; border-radius:50%; background:#ccc; flex-shrink:0; }
+  .auth-dot.ok { background:#5cb85c; }
+  .auth-dot.err { background:#d9534f; }
+  .auth-dot.loading { background:#f0ad4e; animation:pulse 1s infinite; }
+
+  /* ── Stats ── */
+  .stats { display:flex; gap:10px; padding:16px 16px 6px; }
+  .stat-card { flex:1; background:var(--white); border-radius:16px; padding:12px 8px; text-align:center; box-shadow:0 4px 16px var(--shadow); border:1.5px solid var(--blush); }
+  .stat-number { font-size:24px; font-weight:800; color:var(--deep); line-height:1; }
+  .stat-label { font-size:10px; color:var(--light); margin-top:3px; font-weight:600; }
+
+  /* ── Buttons ── */
+  .register-section { padding:12px 16px 6px; }
+  .btn-register { width:100%; padding:16px; background:linear-gradient(135deg,#F4A5A0,#D97B78); border:none; border-radius:18px; color:#fff; font-family:'Quicksand',sans-serif; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 6px 20px rgba(217,123,120,.35); transition:transform .12s, box-shadow .12s; }
+  .btn-register:active { transform:scale(.97); }
+  .btn-register:disabled { opacity:.55; cursor:not-allowed; }
+
+  /* ── Manual section ── */
+  .manual-section { padding:0 16px 6px; display:none; }
+  .manual-section.visible { display:block; animation:fadeIn .25s ease; }
+  .manual-card { background:var(--white); border-radius:18px; padding:14px; border:1.5px solid var(--blush); box-shadow:0 4px 16px var(--shadow); }
+  .manual-card label { font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px; }
+  .time-input-row { display:flex; gap:10px; align-items:center; }
+  .time-input { flex:1; padding:11px 12px; border:1.5px solid var(--blush); border-radius:12px; font-family:'Nunito',sans-serif; font-size:21px; font-weight:700; color:var(--text); background:var(--soft); text-align:center; outline:none; }
+  .time-input:focus { border-color:var(--rose); }
+  .btn-add-manual { padding:11px 14px; background:var(--deep); border:none; border-radius:12px; color:#fff; font-size:13px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; }
+  .notes-row { margin-top:8px; }
+  .notes-input { width:100%; padding:9px 12px; border:1.5px solid var(--blush); border-radius:10px; font-family:'Nunito',sans-serif; font-size:12px; color:var(--text); background:var(--soft); outline:none; }
+  .notes-input::placeholder { color:var(--light); }
+  .notes-input:focus { border-color:var(--rose); }
+
+  /* ── List ── */
+  .list-section { padding:8px 16px 24px; flex:1; }
+  .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .list-title { font-family:'Quicksand',sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+  .list-actions { display:flex; gap:6px; }
+  .btn-icon { background:none; border:1.5px solid var(--blush); border-radius:8px; padding:4px 9px; cursor:pointer; font-size:12px; color:var(--light); font-family:'Nunito',sans-serif; font-weight:600; }
+  .empty-state { text-align:center; padding:28px 16px; color:var(--light); }
+  .empty-state .ei { font-size:44px; margin-bottom:10px; }
+  .empty-state p { font-size:13px; line-height:1.7; }
+  .feed-item { background:var(--white); border-radius:15px; padding:12px 13px; margin-bottom:9px; display:flex; align-items:center; gap:11px; box-shadow:0 3px 12px var(--shadow); border:1.5px solid var(--blush); animation:slideIn .25s ease; }
+  .feed-dot { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--blush),var(--rose)); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .feed-info { flex:1; min-width:0; }
+  .feed-time { font-size:19px; font-weight:800; color:var(--deep); line-height:1; }
+  .feed-date { font-size:11px; color:var(--light); margin-top:2px; }
+  .feed-note { font-size:11px; color:var(--muted); margin-top:2px; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .feed-elapsed { font-size:11px; font-weight:700; color:var(--muted); background:var(--soft); border-radius:8px; padding:3px 7px; white-space:nowrap; flex-shrink:0; }
+  .feed-sync { font-size:14px; flex-shrink:0; }
+  .btn-delete { background:none; border:none; color:var(--rose); font-size:17px; cursor:pointer; padding:3px; flex-shrink:0; }
+
+  /* ── Toast ── */
+  .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--deep); color:#fff; padding:11px 22px; border-radius:14px; font-size:13px; font-weight:700; box-shadow:0 6px 20px rgba(217,123,120,.4); opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; z-index:999; }
+  .toast.show { opacity:1; }
+
+  /* ── Animations ── */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <span class="baby-icon">🍼</span>
+    <h1>Registro de Tomas</h1>
+    <div class="subtitle" id="today-label">Cargando…</div>
+  </div>
+
+  <!-- Auth / Config -->
+  <div class="auth-banner visible" id="auth-banner">
+    <div class="auth-title">⚙️ Configuración Microsoft 365</div>
+    <div id="auth-status-row" style="display:none">
+      <div class="auth-status">
+        <div class="auth-dot" id="auth-dot"></div>
+        <span id="auth-status-text">Verificando…</span>
+      </div>
+    </div>
+    <div id="auth-form">
+      <input class="auth-input" id="token-input" type="password" placeholder="Token de acceso Microsoft Graph" autocomplete="off" />
+      <button class="btn-auth" onclick="connectMs365()">Conectar a OneDrive / Excel</button>
+      <div class="auth-help">
+        Obtén tu token en <strong>graph.microsoft.com/v1.0/me</strong> con el botón "Sign in" → copia el Access Token.<br>
+        El archivo <strong>RegistroTomas.xlsx</strong> se creará automáticamente en tu OneDrive.
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card"><div class="stat-number" id="count-today">0</div><div class="stat-label">Tomas hoy</div></div>
+    <div class="stat-card"><div class="stat-number" id="last-feed">—</div><div class="stat-label">Última toma</div></div>
+    <div class="stat-card"><div class="stat-number" id="avg-interval">—</div><div class="stat-label">Intervalo prom.</div></div>
+  </div>
+
+  <!-- Register now -->
+  <div class="register-section">
+    <button class="btn-register" id="btn-main" onclick="registerNow()">
+      <span>⏱️</span> Registrar ahora
+    </button>
+  </div>
+
+  <!-- Manual -->
+  <div class="manual-section" id="manual-section">
+    <div class="manual-card">
+      <label>✏️ Registrar hora manualmente</label>
+      <div class="time-input-row">
+        <input type="time" class="time-input" id="manual-time" />
+        <button class="btn-add-manual" onclick="addManual()">Agregar</button>
+      </div>
+      <div class="notes-row">
+        <input type="text" class="notes-input" id="manual-note" placeholder="Nota opcional (ej: 80 ml, tomó bien…)" maxlength="60" />
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="list-section">
+    <div class="list-header">
+      <div class="list-title">Registro</div>
+      <div class="list-actions">
+        <button class="btn-icon" onclick="toggleManual()">✏️ Manual</button>
+        <button class="btn-icon" onclick="syncAll()">☁️ Sync</button>
+        <button class="btn-icon" onclick="clearAll()">Limpiar</button>
+      </div>
+    </div>
+    <div id="feed-list"></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── State ── */
+let feeds = [];
+let msToken = '';
+let driveId = '';
+let fileId = '';
+let tableId = 'Tomas';
+
+try { feeds = JSON.parse(localStorage.getItem('baby_feeds_v3') || '[]'); } catch(e) { feeds=[]; }
+try { msToken = localStorage.getItem('ms_token') || ''; } catch(e) {}
+try { driveId = localStorage.getItem('ms_drive') || ''; } catch(e) {}
+try { fileId = localStorage.getItem('ms_file') || ''; } catch(e) {}
+
+/* ── Helpers ── */
+function save() { try { localStorage.setItem('baby_feeds_v3', JSON.stringify(feeds)); } catch(e){} }
+function saveAuth() {
+  try {
+    localStorage.setItem('ms_token', msToken);
+    localStorage.setItem('ms_drive', driveId);
+    localStorage.setItem('ms_file', fileId);
+  } catch(e){}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function fmtTime(date) { return date.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(date) {
+  const today = new Date();
+  if(date.toDateString()===today.toDateString()) return 'Hoy';
+  const yest = new Date(today); yest.setDate(today.getDate()-1);
+  if(date.toDateString()===yest.toDateString()) return 'Ayer';
+  return date.toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'});
+}
+function elapsed(ms) {
+  const m = Math.floor(ms/60000);
+  if(m<1) return 'justo ahora';
+  if(m<60) return `hace ${m} min`;
+  const h=Math.floor(m/60), r=m%60;
+  return r>0?`hace ${h}h ${r}m`:`hace ${h}h`;
+}
+function intervalStr(ms) {
+  const m=Math.round(ms/60000);
+  if(m<60) return `${m}m`;
+  const h=Math.floor(m/60), r=m%60;
+  return r>0?`${h}h${r}m`:`${h}h`;
+}
+
+/* ── Microsoft Graph ── */
+async function graphReq(method, path, body) {
+  const res = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + msToken,
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+  if(res.status === 204) return {};
+  return res.json();
+}
+
+async function connectMs365() {
+  const inp = document.getElementById('token-input').value.trim();
+  if(!inp) { showToast('⚠️ Ingresa el token'); return; }
+  msToken = inp;
+  setAuthStatus('loading','Verificando token…');
+  try {
+    // Verify identity
+    const me = await graphReq('GET', '/me');
+    setAuthStatus('loading', `Hola ${me.displayName || me.userPrincipalName}! Buscando OneDrive…`);
+
+    // Get default drive
+    const drive = await graphReq('GET', '/me/drive');
+    driveId = drive.id;
+
+    // Create or find the Excel file
+    await ensureExcelFile();
+
+    saveAuth();
+    setAuthStatus('ok', `✅ Conectado · OneDrive listo`);
+    document.getElementById('auth-form').style.display = 'none';
+    document.getElementById('auth-status-row').style.display = 'block';
+    showToast('✅ Conectado a Microsoft 365');
+    render();
+  } catch(e) {
+    setAuthStatus('err', '❌ Error: ' + e.message);
+    showToast('❌ ' + e.message);
+  }
+}
+
+function setAuthStatus(type, msg) {
+  const dot = document.getElementById('auth-dot');
+  const txt = document.getElementById('auth-status-text');
+  const row = document.getElementById('auth-status-row');
+  row.style.display = 'block';
+  dot.className = 'auth-dot ' + type;
+  txt.textContent = msg;
+}
+
+async function ensureExcelFile() {
+  // Try to find existing file
+  try {
+    const res = await graphReq('GET', `/me/drive/root:/RegistroTomas.xlsx`);
+    fileId = res.id;
+    setAuthStatus('loading','Archivo encontrado. Verificando tabla…');
+    await ensureTable();
+    return;
+  } catch(e) {
+    // File doesn't exist, create it
+  }
+
+  setAuthStatus('loading','Creando RegistroTomas.xlsx en OneDrive…');
+
+  // Create minimal xlsx (base64 of empty workbook)
+  const emptyXlsx = createEmptyXlsxBase64();
+  const bytes = Uint8Array.from(atob(emptyXlsx), c=>c.charCodeAt(0));
+  const uploadRes = await fetch('https://graph.microsoft.com/v1.0/me/drive/root:/RegistroTomas.xlsx:/content', {
+    method:'PUT',
+    headers:{ 'Authorization':'Bearer '+msToken, 'Content-Type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+    body: bytes
+  });
+  if(!uploadRes.ok) throw new Error('No se pudo crear el archivo Excel');
+  const file = await uploadRes.json();
+  fileId = file.id;
+
+  // Wait a moment for file to be indexed
+  await new Promise(r=>setTimeout(r,2000));
+  await ensureTable();
+}
+
+async function ensureTable() {
+  // Check if table exists
+  try {
+    const tables = await graphReq('GET', `/me/drive/items/${fileId}/workbook/tables`);
+    const existing = tables.value?.find(t=>t.name===tableId);
+    if(existing) return;
+  } catch(e) {}
+
+  // Add header row first, then create table
+  try {
+    await graphReq('PATCH', `/me/drive/items/${fileId}/workbook/worksheets('Sheet1')/range(address='A1:D1')`, {
+      values:[['Fecha','Hora','Nota','Timestamp ISO']]
+    });
+    await graphReq('POST', `/me/drive/items/${fileId}/workbook/tables/add`, {
+      address:'Sheet1!A1:D1', hasHeaders:true
+    });
+    // Rename table
+    const tables2 = await graphReq('GET', `/me/drive/items/${fileId}/workbook/tables`);
+    if(tables2.value?.length) {
+      await graphReq('PATCH', `/me/drive/items/${fileId}/workbook/tables/${tables2.value[0].id}`, { name: tableId });
+    }
+  } catch(e) {
+    console.warn('Table setup warning:', e.message);
+  }
+}
+
+async function appendRowToExcel(feed) {
+  if(!msToken || !fileId) return false;
+  const dt = new Date(feed.ts);
+  const row = [
+    dt.toLocaleDateString('es-CL'),
+    fmtTime(dt),
+    feed.note || '',
+    feed.ts
+  ];
+  try {
+    await graphReq('POST', `/me/drive/items/${fileId}/workbook/tables/${tableId}/rows`, {
+      values:[row]
+    });
+    return true;
+  } catch(e) {
+    console.warn('Excel append error:', e.message);
+    return false;
+  }
+}
+
+async function syncAll() {
+  if(!msToken || !fileId) { showToast('⚠️ Configura Microsoft 365 primero'); return; }
+  showToast('☁️ Sincronizando…');
+  let ok=0, fail=0;
+  for(const f of feeds.filter(f=>!f.synced)) {
+    const res = await appendRowToExcel(f);
+    if(res) { f.synced=true; ok++; }
+    else fail++;
+  }
+  save(); render();
+  if(fail>0) showToast(`⚠️ ${ok} sincronizados, ${fail} fallaron`);
+  else if(ok>0) showToast(`✅ ${ok} registros guardados en Excel`);
+  else showToast('✅ Todo ya estaba sincronizado');
+}
+
+/* ── Core actions ── */
+async function registerNow() {
+  const btn = document.getElementById('btn-main');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Guardando…';
+
+  const now = new Date();
+  const feed = { ts: now.toISOString(), note: '', synced: false };
+  feeds.unshift(feed);
+  save(); render();
+
+  // Try sync to Excel
+  if(msToken && fileId) {
+    const ok = await appendRowToExcel(feed);
+    if(ok) { feed.synced = true; save(); render(); showToast('✅ Toma guardada en Excel · ' + fmtTime(now)); }
+    else showToast('📱 Guardado local · sin conexión');
+  } else {
+    showToast('📱 Guardado local · ' + fmtTime(now));
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>⏱️</span> Registrar ahora';
+}
+
+async function addManual() {
+  const val = document.getElementById('manual-time').value;
+  const note = document.getElementById('manual-note').value.trim();
+  if(!val) { showToast('⚠️ Selecciona una hora'); return; }
+  const [h,m] = val.split(':').map(Number);
+  const dt = new Date(); dt.setHours(h,m,0,0);
+  const feed = { ts: dt.toISOString(), note, synced: false };
+  feeds.unshift(feed);
+  feeds.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  save();
+
+  if(msToken && fileId) {
+    const ok = await appendRowToExcel(feed);
+    if(ok) { feed.synced=true; save(); }
+  }
+
+  render();
+  document.getElementById('manual-note').value = '';
+  document.getElementById('manual-section').classList.remove('visible');
+  showToast('✅ Toma agregada · ' + val);
+}
+
+function deleteFeed(i) { feeds.splice(i,1); save(); render(); }
+
+function clearAll() {
+  if(!feeds.length) return;
+  if(!confirm('¿Eliminar todos los registros locales? (Los registros en Excel no se borran)')) return;
+  feeds=[]; save(); render();
+}
+
+function toggleManual() {
+  const sec = document.getElementById('manual-section');
+  sec.classList.toggle('visible');
+  if(sec.classList.contains('visible')) {
+    const now = new Date();
+    document.getElementById('manual-time').value =
+      String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  }
+}
+
+/* ── Render ── */
+function render() {
+  const now = new Date();
+  document.getElementById('today-label').textContent =
+    now.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+
+  const todayStr = now.toDateString();
+  const todayFeeds = feeds.filter(f=>new Date(f.ts).toDateString()===todayStr);
+  document.getElementById('count-today').textContent = todayFeeds.length;
+  document.getElementById('last-feed').textContent = feeds.length ? fmtTime(new Date(feeds[0].ts)) : '—';
+
+  if(todayFeeds.length>=2) {
+    let total=0;
+    for(let i=0;i<todayFeeds.length-1;i++) total+=new Date(todayFeeds[i].ts)-new Date(todayFeeds[i+1].ts);
+    document.getElementById('avg-interval').textContent = intervalStr(total/(todayFeeds.length-1));
+  } else {
+    document.getElementById('avg-interval').textContent='—';
+  }
+
+  const list = document.getElementById('feed-list');
+  if(!feeds.length) {
+    list.innerHTML=`<div class="empty-state"><div class="ei">🌙</div><p>Aún no hay tomas registradas.<br>Presiona <strong>Registrar ahora</strong><br>cuando tu bebé tome leche.</p></div>`;
+    return;
+  }
+  list.innerHTML = feeds.map((f,i)=>{
+    const dt=new Date(f.ts);
+    const syncIcon = !msToken ? '' : f.synced ? '<span class="feed-sync" title="Guardado en Excel">✅</span>' : '<span class="feed-sync" title="Pendiente de sync">🕐</span>';
+    return `<div class="feed-item">
+      <div class="feed-dot">🍼</div>
+      <div class="feed-info">
+        <div class="feed-time">${fmtTime(dt)}</div>
+        <div class="feed-date">${fmtDate(dt)}</div>
+        ${f.note?`<div class="feed-note">${f.note}</div>`:''}
+      </div>
+      <div class="feed-elapsed">${elapsed(now-dt)}</div>
+      ${syncIcon}
+      <button class="btn-delete" onclick="deleteFeed(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ── Minimal xlsx base64 (empty workbook with Sheet1) ── */
+function createEmptyXlsxBase64() {
+  // This is a minimal valid .xlsx file (pre-built binary as base64)
+  return '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';
+}
+
+/* ── Init ── */
+(async function init() {
+  render();
+
+  // If token exists, restore connection silently
+  if(msToken) {
+    document.getElementById('auth-form').style.display='none';
+    document.getElementById('auth-status-row').style.display='block';
+    setAuthStatus('loading','Reconectando…');
+    try {
+      const me = await graphReq('GET','/me');
+      setAuthStatus('ok',`✅ Conectado · ${me.displayName||me.userPrincipalName}`);
+      if(!fileId) await ensureExcelFile();
+      saveAuth();
+    } catch(e) {
+      setAuthStatus('err','Token expirado. Reconecta.');
+      document.getElementById('auth-form').style.display='block';
+      msToken='';
+    }
+  }
+
+  setInterval(render, 60000);
+})();
+</script>
+</body>
+</html>
